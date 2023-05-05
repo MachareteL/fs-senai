@@ -1,2 +1,4 @@
 django_bkp
-backend/venv
+backend/venv/
+web/node_modules/
+web/.next/

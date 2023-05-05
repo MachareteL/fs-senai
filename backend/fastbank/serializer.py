@@ -4,7 +4,7 @@ from .models import *
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cliente
-        fields = ['nome_cliente', 'endereco_cliente', 'tipo_cliente', 'cpf_cnpj', 'foto', 'data_nascimento_criacao', 'usuario']
+        fields = '__all__'
 
 class ContaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,3 +35,13 @@ class ContatosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contatos
         fields = ['codigo_cliente', 'numero_telefone', 'email', 'observacao']
+
+class TipoClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoCliente
+        fields = '__all__'
+
+class EnderecoClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endereco
+        fields = '__all__'

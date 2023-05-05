@@ -7,10 +7,11 @@ class Endereco(models.Model):
     numero = models.IntegerField()
     bairro = models.CharField(max_length=100)
     cidade = models.CharField(max_length=100)
-    estado = models.CharField(max_length=2)
-    complemento = models.CharField(max_length=100)
+    UF = models.CharField(max_length=2)
+    complemento = models.CharField(max_length=100, blank=True, null=True)
     cep = models.CharField(max_length=8)
-
+    def __str__(self) -> str:
+        return self.cep 
     class Meta:
         verbose_name_plural = "Endereço"
 
@@ -27,7 +28,8 @@ class TipoCliente(models.Model):
     tipo_cliente = models.CharField(
         max_length=1, choices=TIPO_CLIENTE, default=PESSOA_FISICA
     )
-
+    def __str__(self) -> str:
+        return self.tipo_cliente
 
 class Cliente(models.Model):
     nome_cliente = models.CharField(max_length=100)
@@ -35,7 +37,8 @@ class Cliente(models.Model):
     tipo_cliente = models.ForeignKey(TipoCliente, on_delete=models.DO_NOTHING)
     foto = models.ImageField(upload_to="imagens/")
     cpf_cnpj = models.CharField(max_length=20)
-    data_nascimento_criacao = models.DateField()
+    data_nascimento = models.DateField()
+    data_criacao = models.DateField(auto_now=True)
     usuario = models.CharField(max_length=20)
     senha = models.IntegerField()
 
@@ -48,7 +51,7 @@ class Cliente(models.Model):
             )
         ]
         verbose_name_plural = "Cliente"
-
+    
     
 class Contatos(models.Model):
     codigo_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
