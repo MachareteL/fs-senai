@@ -50,7 +50,7 @@ class Cliente(models.Model):
                 name="unique_cliente_user",
             )
         ]
-        verbose_name_plural = "Cliente"
+        verbose_name_plural = "Clientes"
     
     
 class Contatos(models.Model):
