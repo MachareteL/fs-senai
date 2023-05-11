@@ -135,9 +135,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:80",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8080",
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://192.168.108.156'
 ]
-
+ALLOWED_HOSTS = [
+    'http://192.168.108.156',
+    '192.168.108.156',
+    '127.0.0.1'
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

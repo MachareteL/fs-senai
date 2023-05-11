@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
-
+from django.contrib.auth.models import User
 # Create your models here.
 class Endereco(models.Model):
     rua = models.CharField(max_length=100)
@@ -31,7 +31,11 @@ class TipoCliente(models.Model):
     def __str__(self) -> str:
         return self.tipo_cliente
 
+
+
+
 class Cliente(models.Model):
+    # user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
     nome_cliente = models.CharField(max_length=100)
     endereco_cliente = models.ForeignKey(Endereco, on_delete=models.PROTECT)
     tipo_cliente = models.ForeignKey(TipoCliente, on_delete=models.DO_NOTHING)
@@ -41,7 +45,8 @@ class Cliente(models.Model):
     data_criacao = models.DateField(auto_now=True)
     usuario = models.CharField(max_length=20)
     senha = models.IntegerField()
-
+    def __str__(self) -> str:
+        return self.nome_cliente
 
     class Meta:
         constraints = [
