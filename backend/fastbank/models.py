@@ -1,6 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser
+from django.contrib.auth.base_user import BaseUserManager
+from django.utils.translation import gettext_lazy as _
+
 # Create your models here.
 class Endereco(models.Model):
     rua = models.CharField(max_length=100)
@@ -32,32 +35,67 @@ class TipoCliente(models.Model):
         return self.tipo_cliente
 
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, cpf_cnpj, password=None, **extra_fields):
+        """
+        Cria e salva um usuário com o CPF e senha fornecidos.
+        """
+        if not cpf_cnpj:
+            raise ValueError('O CPF é obrigatório')
+        
+        user = self.model(cpf_cnpj=cpf_cnpj, **extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, cpf, password=None, **extra_fields):
+        """
+        Cria e salva um superusuário com o CPF e senha fornecidos.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(cpf, password, **extra_fields)
+
+    
+
+class Cliente(AbstractBaseUser):
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    objects = CustomUserManager()
+    username = None
+
+    USERNAME_FIELD = 'cpf_cnpj'
+    REQUIRED_FIELDS = ['nome_cliente', 'endereco_cliente', 'tipo_cliente', 'foto', 'data_nascimento', ]
+
+    def __str__(self):
+        return self.cpf
 
 
-class Cliente(models.Model):
-    # user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
     nome_cliente = models.CharField(max_length=100)
     endereco_cliente = models.ForeignKey(Endereco, on_delete=models.PROTECT)
     tipo_cliente = models.ForeignKey(TipoCliente, on_delete=models.DO_NOTHING)
     foto = models.ImageField(upload_to="imagens/")
-    cpf_cnpj = models.CharField(max_length=20)
+    cpf_cnpj = models.CharField(max_length=20, unique=True)
     data_nascimento = models.DateField()
     data_criacao = models.DateField(auto_now=True)
-    usuario = models.CharField(max_length=20)
-    senha = models.IntegerField()
+
     def __str__(self) -> str:
         return self.nome_cliente
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["usuario"],
-                name="unique_cliente_user",
-            )
-        ]
+        # constraints = [
+        #     models.UniqueConstraint(
+        #         fields=["usuario"],
+        #         name="unique_cliente_user",
+        #     )
+        # ]
         verbose_name_plural = "Clientes"
     
-    
+
+
+
+
+
 class Contatos(models.Model):
     codigo_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     numero_telefone = models.IntegerField()
