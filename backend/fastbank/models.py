@@ -46,6 +46,7 @@ class CustomUserManager(BaseUserManager):
         user = self.model(cpf_cnpj=cpf_cnpj, **extra_fields)
         user.set_password(password)
         user.save()
+        Conta.objects.create(nome_cliente_conta=user, numero_conta=290, agencia=1, digito=1, saldo=10000, conta_ativa=True, tipo_conta="CC")
         return user
 
     def create_superuser(self, cpf, password=None, **extra_fields):
@@ -124,7 +125,7 @@ class Conta(models.Model):
     digito = models.IntegerField()
     saldo = models.IntegerField()
     data_criacao = models.DateField(auto_now=True)
-    conta_ativa = models.BooleanField()
+    conta_ativa = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "Conta"
