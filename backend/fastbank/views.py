@@ -3,11 +3,9 @@ from .serializer import *
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.views import TokenViewBase
+from rest_framework_simplejwt.serializers import get_user_model
 import json
-
-class ClienteView(viewsets.ModelViewSet):
-    queryset = Cliente.objects.all()
-    serializer_class = ClienteSerializer
 
 class Conta(viewsets.ModelViewSet):
     queryset = Conta.objects.all()
@@ -32,10 +30,6 @@ class Conta(viewsets.ModelViewSet):
 class Cartao(viewsets.ModelViewSet):
     queryset = Cartao.objects.all()
     serializer_class = CartaoSerializer
-
-class TipoCliente(viewsets.ModelViewSet):
-    queryset = TipoCliente.objects.all()
-    serializer_class = TipoClienteSerializer
 
 class EnderecoCliente(viewsets.ModelViewSet):
     queryset = Endereco.objects.all()

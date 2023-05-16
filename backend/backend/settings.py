@@ -25,8 +25,6 @@ SECRET_KEY = 'django-insecure-ni#-)t9&w*$n=ot#5rx0c+wyu91vhfkkn8@ni)1a^!3xp(zgoz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -52,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -132,18 +129,27 @@ AUTH_USER_MODEL = 'fastbank.Cliente'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:8080",
-    "http://localhost:80",
+    # "http://localhost:8080",
+    # "http://localhost:80",
     "http://127.0.0.1:3000",
-    "http://127.0.0.1:8080",
-    'http://localhost:3000',
-    'http://192.168.108.156'
+    # "http://127.0.0.1:8080",
+    # 'http://localhost:3000',
+    # 'http://192.168.108.156',
+    # 'http://192.168.67.118'
+    # '192.168.67.118'
 ]
-ALLOWED_HOSTS = [
-    'http://192.168.108.156',
-    '192.168.108.156',
-    '127.0.0.1'
-]
+# ALLOWED_HOSTS = [
+#     'http://192.168.108.156',
+#     '192.168.108.156',
+#     '127.0.0.1',
+#     '192.168.67.118',
+#     'http://192.168.67.118'
+# ]
+
+
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:3000",
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

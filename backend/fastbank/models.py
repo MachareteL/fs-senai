@@ -5,36 +5,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
-class Endereco(models.Model):
-    rua = models.CharField(max_length=100)
-    numero = models.IntegerField()
-    bairro = models.CharField(max_length=100)
-    cidade = models.CharField(max_length=100)
-    UF = models.CharField(max_length=2)
-    complemento = models.CharField(max_length=100, blank=True, null=True)
-    cep = models.CharField(max_length=8)
-    def __str__(self) -> str:
-        return self.cep 
-    class Meta:
-        verbose_name_plural = "Endereço"
-
-
-class TipoCliente(models.Model):
-    PESSOA_FISICA = "F"
-    PESSOA_JURIDICA = "J"
-
-    TIPO_CLIENTE = [
-        (PESSOA_FISICA, "Pessoa Física"),
-        (PESSOA_JURIDICA, "Pessoa Jurídica"),
-    ]
-
-    tipo_cliente = models.CharField(
-        max_length=1, choices=TIPO_CLIENTE, default=PESSOA_FISICA
-    )
-    def __str__(self) -> str:
-        return self.tipo_cliente
-
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, cpf_cnpj, password=None, **extra_fields):
         """
@@ -46,7 +16,7 @@ class CustomUserManager(BaseUserManager):
         user = self.model(cpf_cnpj=cpf_cnpj, **extra_fields)
         user.set_password(password)
         user.save()
-        Conta.objects.create(nome_cliente_conta=user, numero_conta=290, agencia=1, digito=1, saldo=10000, conta_ativa=True, tipo_conta="CC")
+        Conta.objects.create(cliente=user, numero_conta=290, agencia=1, digito=1, saldo=10000, conta_ativa=True, tipo_conta="CC")
         return user
 
     def create_superuser(self, cpf, password=None, **extra_fields):
@@ -60,21 +30,29 @@ class CustomUserManager(BaseUserManager):
     
 
 class Cliente(AbstractBaseUser):
+    PESSOA_FISICA = "F"
+    PESSOA_JURIDICA = "J"
+
+    TIPO_CLIENTE = [
+        (PESSOA_FISICA, "Pessoa Física"),
+        (PESSOA_JURIDICA, "Pessoa Jurídica"),
+    ]
+
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     objects = CustomUserManager()
     username = None
 
     USERNAME_FIELD = 'cpf_cnpj'
-    REQUIRED_FIELDS = ['nome_cliente', 'endereco_cliente', 'tipo_cliente', 'foto', 'data_nascimento', ]
+    REQUIRED_FIELDS = ['nome_cliente', 'tipo_cliente', 'foto', 'data_nascimento']
 
     def __str__(self):
         return self.cpf
 
 
     nome_cliente = models.CharField(max_length=100)
-    endereco_cliente = models.ForeignKey(Endereco, on_delete=models.PROTECT)
-    tipo_cliente = models.ForeignKey(TipoCliente, on_delete=models.DO_NOTHING)
+    tipo_cliente = models.CharField(max_length=1, choices=TIPO_CLIENTE, default=PESSOA_FISICA)
     foto = models.ImageField(upload_to="imagens/")
     cpf_cnpj = models.CharField(max_length=20, unique=True)
     data_nascimento = models.DateField()
@@ -95,7 +73,19 @@ class Cliente(AbstractBaseUser):
 
 
 
-
+class Endereco(models.Model):
+    rua = models.CharField(max_length=100)
+    numero = models.IntegerField()
+    bairro = models.CharField(max_length=100)
+    cidade = models.CharField(max_length=100)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    UF = models.CharField(max_length=2)
+    complemento = models.CharField(max_length=100, blank=True, null=True)
+    cep = models.CharField(max_length=8)
+    def __str__(self) -> str:
+        return self.cep 
+    class Meta:
+        verbose_name_plural = "Endereço"
 
 class Contatos(models.Model):
     codigo_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
@@ -119,7 +109,7 @@ class Conta(models.Model):
     tipo_conta = models.CharField(
         max_length=2, choices=TIPO_CONTA, default=CONTA_CORRENTE
     )
-    nome_cliente_conta = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+    cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
     numero_conta = models.IntegerField()
     agencia = models.IntegerField()
     digito = models.IntegerField()
@@ -192,3 +182,5 @@ class Investimento(models.Model):
 class ClienteConta(models.Model):
     codigo_conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
     codigo_cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+
+# SELECT CLIENTE.NOME, CLIENTE.CPF FROM CLIENTE INNER JOIN CONTA ON CLIENTE.ID = CONTA.CLIENTE_ID GROUP BY CLIENTE.NOME, CLIENTE.CPF
