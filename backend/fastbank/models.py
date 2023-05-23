@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+import random
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
@@ -16,7 +17,7 @@ class CustomUserManager(BaseUserManager):
         user = self.model(cpf_cnpj=cpf_cnpj, **extra_fields)
         user.set_password(password)
         user.save()
-        Conta.objects.create(cliente=user, numero_conta=290, agencia=1, digito=1, saldo=10000, conta_ativa=True, tipo_conta="CC")
+        Conta.objects.create(cliente=user, numero_conta=random.randint(1324, 9655), agencia=311, digito=random.randint(0, 98), saldo=0, conta_ativa=True, tipo_conta="CC")
         return user
 
     def create_superuser(self, cpf, password=None, **extra_fields):
@@ -85,7 +86,7 @@ class Endereco(models.Model):
     def __str__(self) -> str:
         return self.cep 
     class Meta:
-        verbose_name_plural = "Endereço"
+        verbose_name_plural = "Endereços"
 
 class Contatos(models.Model):
     codigo_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
@@ -113,24 +114,34 @@ class Conta(models.Model):
     numero_conta = models.IntegerField()
     agencia = models.IntegerField()
     digito = models.IntegerField()
-    saldo = models.IntegerField()
+    saldo = models.DecimalField(max_digits=10, decimal_places=2)
     data_criacao = models.DateField(auto_now=True)
     conta_ativa = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name_plural = "Conta"
+        verbose_name_plural = "Contas"
 
     def __str__(self) -> str:
         return str(self.id)
 
 
 class Cartao(models.Model):
+
+    MASTERCARD = "M"
+    VISA = "V"
+    BANDEIRA = [
+        (MASTERCARD, "Bandeira Visa"),
+        (VISA, "Bandeira MasterCard"),
+    ]
+
     numero_cartao = models.CharField(max_length=20)
-    conta_cartao = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
+    conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
     cvv = models.IntegerField()
     data_vencimento = models.DateField()
-    bandeira = models.CharField(max_length=20)
     nome_titular_cartao = models.CharField(max_length=100)
+    bandeira = models.CharField(
+        max_length=2, choices=BANDEIRA, default=VISA
+    )
     cartao_ativo = models.BooleanField()
 
     class Meta:
@@ -140,29 +151,31 @@ class Cartao(models.Model):
                 name="unique_numero_cartao",
             )
         ]
-        verbose_name_plural = "Cartao"
+        verbose_name_plural = "Cartões"
 
 
 class Movimentacao(models.Model):
-    DEBITO = "D"
-    CREDITO = "C"
-    PIX = "P"
-
+    DEBITO = "TD"
+    CREDITO = "TC"
+    PIX = "PX"
+    DEPOSITO = "DP"
 
     TIPO_OPERACAO = [
         (DEBITO, "Transferência Débito"),
         (CREDITO, "Transferência Crédito"),
+        (DEPOSITO, "Transferência Crédito"),
         (PIX, "Transferência PIX"),
     ]
 
-    codigo_cartao = models.ForeignKey(Cartao, on_delete=models.PROTECT)
+    conta = models.ForeignKey(Conta, on_delete=models.PROTECT)
+    cartao = models.ForeignKey(Cartao, on_delete=models.PROTECT, blank=True, null=True)
     data_hora = models.DateTimeField(auto_now=True)
-    operacao = models.CharField(max_length=1, choices=TIPO_OPERACAO, default=DEBITO)
+    operacao = models.CharField(max_length=2, choices=TIPO_OPERACAO, default=DEBITO)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class Emprestimo(models.Model):
-    codigo_conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
+    conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
     data_solicitacao = models.DateField()
     valor_solicitado = models.DecimalField(max_digits=10, decimal_places=2)
     juros = models.DecimalField(max_digits=10, decimal_places=2)
@@ -173,14 +186,14 @@ class Emprestimo(models.Model):
 
 
 class Investimento(models.Model):
-    codigo_conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
+    conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
     aporte = models.DecimalField(max_digits=10, decimal_places=2)
     rentabilidade = models.DecimalField(max_digits=10, decimal_places=2)
     finalizado = models.BooleanField()
 
 
 class ClienteConta(models.Model):
-    codigo_conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
-    codigo_cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+    conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
+    cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
 
 # SELECT CLIENTE.NOME, CLIENTE.CPF FROM CLIENTE INNER JOIN CONTA ON CLIENTE.ID = CONTA.CLIENTE_ID GROUP BY CLIENTE.NOME, CLIENTE.CPF

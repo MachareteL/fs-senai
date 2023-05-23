@@ -34,4 +34,3 @@ class Cartao(viewsets.ModelViewSet):
 class EnderecoCliente(viewsets.ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoClienteSerializer
-# Create your views here.
