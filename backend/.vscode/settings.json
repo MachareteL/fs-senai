@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/87d9d830-cf52-4b90-a542-4879fcd7d698/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/fastbankBackend",
+    "appService.deploySubpath": "."
+}

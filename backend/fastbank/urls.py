@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 from rest_framework.routers import DefaultRouter
 from .views import *
 rota = DefaultRouter()
@@ -8,5 +7,5 @@ rota = DefaultRouter()
 rota.register('cartao', viewset=Cartao)
 rota.register('conta', viewset=Conta)
 rota.register('enderecoCliente', viewset=EnderecoCliente)
-
+rota.register('movimentacao', viewset=Movimentacao)
 urlpatterns = []+rota.urls

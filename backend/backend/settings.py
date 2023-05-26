@@ -131,12 +131,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     # "http://localhost:8080",
     # "http://localhost:80",
-    "http://127.0.0.1:3000",
-    # "http://127.0.0.1:8080",
+    "http://127.0.0.1:3000", 
+    "http://127.0.0.1:8000",
     # 'http://localhost:3000',
     # 'http://192.168.108.156',
-    'http://192.168.67.118'
-    '192.168.67.118'
+    'http://localhost:19006',
 ]
 ALLOWED_HOSTS = [
     '192.168.108.156',

@@ -89,10 +89,10 @@ class Endereco(models.Model):
         verbose_name_plural = "Endereços"
 
 class Contatos(models.Model):
-    codigo_cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     numero_telefone = models.IntegerField()
     email = models.EmailField()
-    observacao = models.CharField(max_length=255)
+    observacao = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Contatos"
@@ -152,7 +152,8 @@ class Cartao(models.Model):
             )
         ]
         verbose_name_plural = "Cartões"
-
+    def __str__(self) -> str:
+        return self.numero_cartao
 
 class Movimentacao(models.Model):
     DEBITO = "TD"
@@ -163,7 +164,7 @@ class Movimentacao(models.Model):
     TIPO_OPERACAO = [
         (DEBITO, "Transferência Débito"),
         (CREDITO, "Transferência Crédito"),
-        (DEPOSITO, "Transferência Crédito"),
+        (DEPOSITO, "Depósito em Conta"),
         (PIX, "Transferência PIX"),
     ]
 
@@ -172,7 +173,6 @@ class Movimentacao(models.Model):
     data_hora = models.DateTimeField(auto_now=True)
     operacao = models.CharField(max_length=2, choices=TIPO_OPERACAO, default=DEBITO)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
-
 
 class Emprestimo(models.Model):
     conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)

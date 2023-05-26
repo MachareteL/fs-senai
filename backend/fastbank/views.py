@@ -7,6 +7,8 @@ from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.serializers import get_user_model
 from rest_framework.response import Response
 from .models import Conta as ContaModel
+from .models import Movimentacao as MovimentacaoModel
+from decimal import Decimal
 import json
 
 class Conta(viewsets.ReadOnlyModelViewSet):
@@ -20,17 +22,46 @@ class Conta(viewsets.ReadOnlyModelViewSet):
         # print(dados)
         usuario = dados['user_id']
         print(usuario)    
-        responsavel = Cliente.objects.get(id=usuario)
         # responsavel = get_object_or_404(Cliente, id=usuario)
-        print(responsavel)
-        contaResponsavel = ContaModel.objects.get(cliente=responsavel)
+        contaResponsavel = ContaModel.objects.get(cliente=usuario)
         serializer = ContaSerializer(contaResponsavel)
         return Response(data=serializer.data, status=200)
 
 class Cartao(viewsets.ModelViewSet):
     queryset = Cartao.objects.all()
     serializer_class = CartaoSerializer
+    
+    def create(self, request, *args, **kwargs):
+
+        return super().create(request, *args, **kwargs)
 
 class EnderecoCliente(viewsets.ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoClienteSerializer
+
+class Movimentacao(viewsets.ModelViewSet):
+    queryset = Movimentacao.objects.all()
+    serializer_class = MovimentacaoSerializer
+
+    def create(self, request, *args, **kwargs):
+        req = request.data #{'conta' 'cartao' 'operacao' 'valor'}
+        token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+        acess = AccessToken(token)
+        usuario = acess['user_id']
+
+        if req['operacao'] == 'DP':
+            destino = ContaModel.objects.get(cliente=usuario)
+            valor = req['valor']
+            destino.saldo += Decimal(valor)
+            destino.save()
+        return super().create(request, *args, **kwargs)
+    
+    def list(self, request, *args, **kwargs):
+        req = request.data #{'conta' 'cartao' 'operacao' 'valor'}
+        token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+        acess = AccessToken(token)
+        usuario = acess['user_id']
+        instancia = MovimentacaoModel.objects.filter(conta=usuario)
+        print(instancia)
+        res = MovimentacaoSerializer(instancia, many=True)
+        return Response(res.data)
