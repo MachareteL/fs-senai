@@ -173,6 +173,7 @@ class Movimentacao(models.Model):
     data_hora = models.DateTimeField(auto_now=True)
     operacao = models.CharField(max_length=2, choices=TIPO_OPERACAO, default=DEBITO)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
+    destinatario = models.CharField(max_length=16, blank=False, null=False)
 
 class Emprestimo(models.Model):
     conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)

@@ -40,7 +40,7 @@ class EnderecoCliente(viewsets.ModelViewSet):
     serializer_class = EnderecoClienteSerializer
 
 class Movimentacao(viewsets.ModelViewSet):
-    queryset = Movimentacao.objects.all()
+    queryset = Movimentacao.objects.all().order_by('-data_hora')
     serializer_class = MovimentacaoSerializer
 
     def create(self, request, *args, **kwargs):
@@ -56,12 +56,16 @@ class Movimentacao(viewsets.ModelViewSet):
             destino.save()
         return super().create(request, *args, **kwargs)
     
-    def list(self, request, *args, **kwargs):
-        req = request.data #{'conta' 'cartao' 'operacao' 'valor'}
-        token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
-        acess = AccessToken(token)
-        usuario = acess['user_id']
-        instancia = MovimentacaoModel.objects.filter(conta=usuario)
-        print(instancia)
-        res = MovimentacaoSerializer(instancia, many=True)
-        return Response(res.data)
+    # def list(self, request, *args, **kwargs):
+    #     req = request.data #{'conta' 'cartao' 'operacao' 'valor'}
+    #     token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+    #     acess = AccessToken(token)
+    #     usuario = acess['user_id']
+    #     instancia = MovimentacaoModel.objects.filter(conta=usuario).order_by('-data_hora')
+    #     print(instancia)
+    #     res = MovimentacaoSerializer(instancia, many=True)
+    #     return Response(res.data)
+    
+class Cliente(viewsets.ReadOnlyModelViewSet):
+    queryset = Cliente.objects.all()
+    serializer_class = ClienteSerializer
