@@ -143,6 +143,8 @@ ALLOWED_HOSTS = [
     '192.168.67.118',
     '192.168.180.102',
     '192.168.253.71',
+    'https://fastbankbackend.azurewebsites.net/',
+    '*'
 ]
 
 
