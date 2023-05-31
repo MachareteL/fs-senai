@@ -17,7 +17,10 @@ class CustomUserManager(BaseUserManager):
         user = self.model(cpf_cnpj=cpf_cnpj, **extra_fields)
         user.set_password(password)
         user.save()
+        # print(user)
         Conta.objects.create(cliente=user, numero_conta=random.randint(1324, 9655), agencia=311, digito=random.randint(0, 98), saldo=0, conta_ativa=True, tipo_conta="CC")
+        conta = Conta.objects.get(cliente=user)
+        Cartao.objects.create(numero_cartao=str(random.randint(10000000000000000000,98765432109876543210)), conta=conta, nome_titular_cartao=extra_fields['nome_cliente'], bandeira=random.choice(['V','M']), cartao_ativo=True, data_vencimento='2026-01-06', cvv=random.randint(156,396))
         return user
 
     def create_superuser(self, cpf, password=None, **extra_fields):
@@ -46,7 +49,7 @@ class Cliente(AbstractBaseUser):
     username = None
 
     USERNAME_FIELD = 'cpf_cnpj'
-    REQUIRED_FIELDS = ['nome_cliente', 'tipo_cliente', 'foto', 'data_nascimento']
+    REQUIRED_FIELDS = ['nome_cliente', 'tipo_cliente', 'data_nascimento']
 
     def __str__(self):
         return self.cpf
@@ -54,7 +57,7 @@ class Cliente(AbstractBaseUser):
 
     nome_cliente = models.CharField(max_length=100)
     tipo_cliente = models.CharField(max_length=1, choices=TIPO_CLIENTE, default=PESSOA_FISICA)
-    foto = models.ImageField(upload_to="imagens/")
+    foto = models.ImageField(upload_to="imagens/", blank=True, null=True)
     cpf_cnpj = models.CharField(max_length=20, unique=True)
     data_nascimento = models.DateField()
     data_criacao = models.DateField(auto_now=True)

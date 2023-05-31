@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from .models import Conta as ContaModel
 from .models import Movimentacao as MovimentacaoModel
 from decimal import Decimal
-import json
 
 class Conta(viewsets.ReadOnlyModelViewSet):
     queryset = Conta.objects.all()
