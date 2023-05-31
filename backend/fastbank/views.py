@@ -29,10 +29,6 @@ class Conta(viewsets.ReadOnlyModelViewSet):
 class Cartao(viewsets.ModelViewSet):
     queryset = Cartao.objects.all()
     serializer_class = CartaoSerializer
-    
-    def create(self, request, *args, **kwargs):
-
-        return super().create(request, *args, **kwargs)
 
 class EnderecoCliente(viewsets.ModelViewSet):
     queryset = Endereco.objects.all()

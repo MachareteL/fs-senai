@@ -18,9 +18,14 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save()
         # print(user)
-        Conta.objects.create(cliente=user, numero_conta=random.randint(1324, 9655), agencia=311, digito=random.randint(0, 98), saldo=0, conta_ativa=True, tipo_conta="CC")
+        Conta.objects.create(cliente=user, numero_conta=random.randint(1324, 9655), 
+                             agencia=311, digito=random.randint(0, 98), 
+                             saldo=0, conta_ativa=True, tipo_conta="CC")
         conta = Conta.objects.get(cliente=user)
-        Cartao.objects.create(numero_cartao=str(random.randint(10000000000000000000,98765432109876543210)), conta=conta, nome_titular_cartao=extra_fields['nome_cliente'], bandeira=random.choice(['V','M']), cartao_ativo=True, data_vencimento='2026-01-06', cvv=random.randint(156,396))
+        Cartao.objects.create(numero_cartao=str(random.randint(10000000000000000000, 98765432109876543210)), 
+                              conta=conta, nome_titular_cartao=extra_fields['nome_cliente'], 
+                              bandeira=random.choice(['V','M']), cartao_ativo=True, data_vencimento='2026-01-06', 
+                              cvv=random.randint(156,396))
         return user
 
     def create_superuser(self, cpf, password=None, **extra_fields):
