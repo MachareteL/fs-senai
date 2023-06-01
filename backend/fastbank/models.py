@@ -54,7 +54,7 @@ class Cliente(AbstractBaseUser):
     username = None
 
     USERNAME_FIELD = 'cpf_cnpj'
-    REQUIRED_FIELDS = ['nome_cliente', 'tipo_cliente', 'data_nascimento']
+    REQUIRED_FIELDS = ['nome_cliente', 'tipo_cliente', 'data_nascimento', 'foto']
 
     def __str__(self):
         return self.cpf
