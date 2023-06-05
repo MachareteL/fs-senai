@@ -12,6 +12,13 @@ from .models import Conta as ContaModel, Cliente as ClienteModel
 from .models import Movimentacao as MovimentacaoModel
 from decimal import Decimal
 
+def getUserId(request):
+    token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+    acess = AccessToken(token)
+    usuario = acess['user_id']
+    return usuario 
+
+
 class Conta(viewsets.ReadOnlyModelViewSet):
     queryset = Conta.objects.all()
     serializer_class = ContaSerializer
@@ -35,6 +42,13 @@ class Cartao(viewsets.ModelViewSet):
 class EnderecoCliente(viewsets.ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoClienteSerializer
+
+    def create(self, request, *args, **kwargs):
+        usuario = getUserId(request)
+        cliente = ClienteModel.objects.get(id=usuario)
+        req = request.data
+        Endereco.objects.create(rua=req['rua'], numero=req['numero'], bairro=req['bairro'] ,cidade= req['cidade'], cliente=cliente, UF= req['uf'], cep=req['cep'])
+        return super().retrieve(request, *args, **kwargs)
 
 class Movimentacao(viewsets.ModelViewSet):
     queryset = Movimentacao.objects.all().order_by('-data_hora')
@@ -90,3 +104,7 @@ class Movimentacao(viewsets.ModelViewSet):
 class Cliente(viewsets.ReadOnlyModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
+
+class FAQ(viewsets.ModelViewSet):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer

@@ -40,3 +40,8 @@ class EnderecoClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Endereco
         fields = '__all__'
+
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = '__all__'

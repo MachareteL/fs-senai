@@ -164,14 +164,14 @@ class Cartao(models.Model):
         return self.numero_cartao
 
 class Movimentacao(models.Model):
-    DEBITO = "TD"
-    CREDITO = "TC"
+    EMPRESTIMO = "ET"
+    TRANSFERENCIA = "TC"
     PIX = "PX"
     DEPOSITO = "DP"
 
     TIPO_OPERACAO = [
-        (DEBITO, "Transferência Débito"),
-        (CREDITO, "Transferência Crédito"),
+        (EMPRESTIMO, "Empréstimo"),
+        (TRANSFERENCIA, "Transferência"),
         (DEPOSITO, "Depósito em Conta"),
         (PIX, "Transferência PIX"),
     ]
@@ -179,7 +179,7 @@ class Movimentacao(models.Model):
     conta = models.ForeignKey(Conta, on_delete=models.PROTECT)
     cartao = models.ForeignKey(Cartao, on_delete=models.PROTECT, blank=True, null=True)
     data_hora = models.DateTimeField(auto_now=True)
-    operacao = models.CharField(max_length=2, choices=TIPO_OPERACAO, default=DEBITO)
+    operacao = models.CharField(max_length=2, choices=TIPO_OPERACAO, default=PIX)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     destinatario = models.CharField(max_length=16, blank=False, null=False)
 
@@ -204,5 +204,13 @@ class Investimento(models.Model):
 class ClienteConta(models.Model):
     conta = models.ForeignKey(Conta, on_delete=models.DO_NOTHING)
     cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+
+class FAQ(models.Model):
+    nome = models.CharField(max_length=50)
+    email = models.EmailField(max_length=70)
+    mensagem = models.TextField()
+
+    def __str__(self) -> str:
+        return self.email
 
 # SELECT CLIENTE.NOME, CLIENTE.CPF FROM CLIENTE INNER JOIN CONTA ON CLIENTE.ID = CONTA.CLIENTE_ID GROUP BY CLIENTE.NOME, CLIENTE.CPF

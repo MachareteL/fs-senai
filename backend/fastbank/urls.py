@@ -9,4 +9,5 @@ rota.register('conta', viewset=Conta)
 rota.register('enderecoCliente', viewset=EnderecoCliente)
 rota.register('movimentacao', viewset=Movimentacao)
 rota.register('cliente', viewset=Cliente)
+rota.register('FAQ', viewset=FAQ)
 urlpatterns = []+rota.urls
