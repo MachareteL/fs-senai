@@ -47,8 +47,17 @@ class EnderecoCliente(viewsets.ModelViewSet):
         usuario = getUserId(request)
         cliente = ClienteModel.objects.get(id=usuario)
         req = request.data
-        Endereco.objects.create(rua=req['rua'], numero=req['numero'], bairro=req['bairro'] ,cidade= req['cidade'], cliente=cliente, UF= req['uf'], cep=req['cep'])
-        return super().retrieve(request, *args, **kwargs)
+        variavel = Endereco.objects.create(rua=req['rua'], numero=req['numero'], bairro=req['bairro'] ,cidade= req['cidade'], cliente=cliente, UF= req['uf'], cep=req['cep'])
+        inst = Endereco.objects.filter(cep=variavel)
+        res = EnderecoClienteSerializer(inst, many=True)
+        return Response(res.data)
+    
+    def list(self, request, *args, **kwargs):
+        usuario = getUserId(request)
+        cliente = ClienteModel.objects.get(id=usuario)
+        endereco = Endereco.objects.filter(cliente=cliente)
+        retorno = EnderecoClienteSerializer(endereco, many=True)
+        return Response(retorno.data)
 
 class Movimentacao(viewsets.ModelViewSet):
     queryset = Movimentacao.objects.all().order_by('-data_hora')
@@ -63,12 +72,12 @@ class Movimentacao(viewsets.ModelViewSet):
         if Decimal(valor) <= 0:
             raise PermissionDenied("O valor não deve ser menor ou igual a 0")
 
-        if req['operacao'] == 'DP':
+        if req['operacao'] == 'DP' or req['operacao'] == "ET":
             destino = ContaModel.objects.get(cliente=usuario)
             destino.saldo += Decimal(valor)
             destino.save()
 
-        if req['operacao'] == 'PX':
+        if req['operacao'] == 'PX' or req['operacao'] == 'TC':
             destino = req['destinatario']
             print('o valor é '+ valor)
             print('o destino '+ destino)
@@ -88,6 +97,7 @@ class Movimentacao(viewsets.ModelViewSet):
                 conta_rementente.save()
             else:
                 raise PermissionDenied("Saldo insuficiente")
+        
             
         return super().create(request, *args, **kwargs)
     
@@ -100,7 +110,7 @@ class Movimentacao(viewsets.ModelViewSet):
         print(instancia)
         res = MovimentacaoSerializer(instancia, many=True)
         return Response(res.data)
-    
+
 class Cliente(viewsets.ReadOnlyModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
